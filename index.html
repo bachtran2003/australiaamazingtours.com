@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Australia Amazing Tours | Du lịch Australia | Du lịch Melbourne</title>
+    <meta name="description" content="Khám phá các tour du lịch Australia, du lịch Melbourne, Sydney, Great Ocean Road, Barossa Valley, Uluru. Trải nghiệm tuyệt vời tại Úc với Australia Amazing Tours." />
+    <meta name="keywords" content="Du lịch Australia, Du lịch Melbourne, Du lịch Sydney, Du lịch Úc, Tour du lịch Úc, Australia tours, Melbourne tours, Sydney tours, Travel to Australia, Australian vacation, Du lịch tự túc Úc, Australian holidays, Great Ocean Road tour, Yarra Valley tour, Uluru tour" />
+    <meta property="og:title" content="Australia Amazing Tours | Du lịch Australia | Du lịch Melbourne" />
+    <meta property="og:description" content="Khám phá các tour du lịch Australia, du lịch Melbourne, Sydney, Great Ocean Road, Barossa Valley, Uluru. Trải nghiệm tuyệt vời tại Úc với Australia Amazing Tours." />
+    <meta property="og:type" content="website" />
+    <script>
+      // Prevent "Cannot set property fetch of #<Window> which has only a getter" error
+      if (typeof window !== 'undefined') {
+        const originalFetch = window.fetch;
+        try {
+          Object.defineProperty(window, 'fetch', {
+            get: () => originalFetch,
+            set: () => { /* ignore */ },
+            configurable: true
+          });
+        } catch (e) {}
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
