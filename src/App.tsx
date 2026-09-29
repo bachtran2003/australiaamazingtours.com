@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Phone, Mail, ChevronRight, ChevronLeft, ChevronDown, Facebook, Twitter, Instagram, Menu, X, ArrowLeft, Check, X as XIcon, Home, Search, Compass, MessageCircle, Send } from 'lucide-react';
+import { MapPin, Phone, Mail, ChevronRight, ChevronLeft, ChevronDown, Facebook, Twitter, Instagram, Menu, X, ArrowLeft, Check, X as XIcon, Home, Search, Compass, MessageCircle, Send, Video, Play } from 'lucide-react';
 
 function PremiumFleetPage({ onBack }: { onBack: () => void }) {
   const images = [
@@ -42,8 +42,7 @@ function PremiumFleetPage({ onBack }: { onBack: () => void }) {
   );
 }
 
-function TourDetailsPage({ tourName, onBack }: { tourName: string, onBack: () => void }) {
-  const tourData: Record<string, any> = {
+const tourData: Record<string, any> = {
     'Melbourne Culture': {
       title: 'Melbourne – Australia’s Most Vibrant and Creative City',
       image: 'https://i.postimg.cc/T2CC25Yj/1_(13).jpg',
@@ -704,6 +703,189 @@ function TourDetailsPage({ tourName, onBack }: { tourName: string, onBack: () =>
     }
   };
 
+  tourData['Uluru & Red Centre'] = tourData['Uluru'];
+
+function VideosPage({ onBack, onSelectTour }: { onBack: () => void; onSelectTour: (tourName: string) => void }) {
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const categories = [
+    'All',
+    'Melbourne & Victoria',
+    'Sydney & NSW',
+    'Queensland',
+    'South Australia',
+    'Red Centre & ACT',
+    'Farm & Nature'
+  ];
+
+  const getRegion = (key: string) => {
+    if (['Melbourne Culture', 'Great Ocean Road', 'Yarra Valley', 'Phillip Island', 'Mt Buller', 'Puffing Billy Steam Train', 'Ballarat Tour'].includes(key)) {
+      return 'Melbourne & Victoria';
+    }
+    if (['Maru Koala Park', 'Mount Macedon', 'Bright Autumn', 'Cherry Farm', 'Strawberry Farm'].includes(key)) {
+      return 'Farm & Nature';
+    }
+    if (['Sydney Highlights', 'Blue Mountains'].includes(key)) {
+      return 'Sydney & NSW';
+    }
+    if (['Great Barrier Reef', 'Brisbane & Gold Coast'].includes(key)) {
+      return 'Queensland';
+    }
+    if (['Adelaide & Barossa'].includes(key)) {
+      return 'South Australia';
+    }
+    if (['Uluru', 'Canberra'].includes(key)) {
+      return 'Red Centre & ACT';
+    }
+    return 'Melbourne & Victoria';
+  };
+
+  const videoList = Object.entries(tourData)
+    .filter(([key, tour]: [string, any]) => tour && tour.videos && tour.videos.length > 0 && key !== 'Uluru & Red Centre')
+    .map(([key, tour]: [string, any]) => ({
+      key,
+      title: tour.title || key,
+      image: tour.image,
+      videos: tour.videos as string[],
+      highlights: tour.highlights || [],
+      price: tour.price,
+      region: getRegion(key)
+    }));
+
+  const filteredVideos = videoList.filter(item => {
+    const matchesCategory = selectedCategory === 'All' || item.region === selectedCategory;
+    const matchesSearch = !searchQuery.trim() || 
+      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.key.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.region.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  return (
+    <div className="bg-gray-50 min-h-screen pb-24 pt-8 px-4 md:px-8">
+      <div className="max-w-7xl mx-auto">
+        <button 
+          onClick={onBack}
+          className="mb-8 text-[#00205B] hover:text-[#BE1E2D] font-bold flex items-center gap-2 transition-colors cursor-pointer"
+        >
+          <ArrowLeft size={20} /> Back to Home
+        </button>
+
+        <div className="bg-gradient-to-r from-[#00205B] via-[#003380] to-[#BE1E2D] rounded-2xl p-8 md:p-12 text-white mb-10 shadow-xl relative overflow-hidden">
+          <div className="relative z-10 max-w-3xl">
+            <span className="bg-white/20 text-white text-xs md:text-sm font-semibold uppercase tracking-wider px-3 py-1 rounded-full inline-block mb-3">
+              Media Gallery
+            </span>
+            <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">Australia Tour Video Highlights</h1>
+            <p className="text-base md:text-lg text-white/90 leading-relaxed">
+              Explore the natural wonders, vibrant cities, and iconic Australian adventures through our high-definition tour videos. Get inspired for your next vacation in Australia!
+            </p>
+          </div>
+          <div className="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
+            <Video size={280} />
+          </div>
+        </div>
+
+        {/* Filter & Search Bar */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-8 flex flex-col md:flex-row gap-4 justify-between items-center">
+          <div className="flex flex-wrap gap-2 w-full md:w-auto">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-all cursor-pointer ${
+                  selectedCategory === cat
+                    ? 'bg-[#00205B] text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          <div className="relative w-full md:w-72">
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search tours or videos..."
+              className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#00205B]"
+            />
+          </div>
+        </div>
+
+        {/* Video Grid */}
+        {filteredVideos.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
+            <p className="text-gray-500 text-lg">No tour videos found matching your filter.</p>
+            <button
+              onClick={() => { setSelectedCategory('All'); setSearchQuery(''); }}
+              className="mt-4 px-6 py-2 bg-[#00205B] text-white rounded-md font-semibold text-sm hover:bg-[#BE1E2D] transition-colors cursor-pointer"
+            >
+              Reset Filters
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredVideos.map((item) => (
+              <div key={item.key} className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col group">
+                <div className="relative aspect-video bg-black">
+                  <iframe
+                    src={item.videos[0]}
+                    title={item.title}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                </div>
+                <div className="p-6 flex flex-col flex-1 justify-between">
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-[#00205B]">
+                        {item.region}
+                      </span>
+                      {item.price && (
+                        <span className="text-xs font-bold text-[#BE1E2D]">
+                          {item.price}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-xl font-bold text-[#00205B] mb-2 group-hover:text-[#BE1E2D] transition-colors line-clamp-1">
+                      {item.title}
+                    </h3>
+                    {item.highlights && item.highlights.length > 0 && (
+                      <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+                        {item.highlights[0]}
+                      </p>
+                    )}
+                  </div>
+                  <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+                    <button
+                      onClick={() => onSelectTour(item.key)}
+                      className="inline-flex items-center gap-1.5 text-sm font-bold text-[#00205B] hover:text-[#BE1E2D] transition-colors cursor-pointer"
+                    >
+                      View Tour Details <ChevronRight size={16} />
+                    </button>
+                    {item.videos.length > 1 && (
+                      <span className="text-xs text-gray-500 font-medium bg-gray-100 px-2 py-0.5 rounded">
+                        +{item.videos.length - 1} more video
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TourDetailsPage({ tourName, onBack }: { tourName: string, onBack: () => void }) {
   const tour = tourData[tourName] || {
     title: tourName,
     image: 'https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?auto=format&fit=crop&w=1200&q=80',
@@ -943,6 +1125,7 @@ export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedTour, setSelectedTour] = useState<string | null>(null);
   const [showPremiumFleet, setShowPremiumFleet] = useState(false);
+  const [showVideosPage, setShowVideosPage] = useState(false);
   const [lastEscapeTime, setLastEscapeTime] = useState<number>(0);
 
   useEffect(() => {
@@ -952,6 +1135,8 @@ export default function App() {
           setZoomedImage(null);
         } else if (showPremiumFleet) {
           setShowPremiumFleet(false);
+        } else if (showVideosPage) {
+          setShowVideosPage(false);
         } else if (selectedTour) {
           const now = Date.now();
           if (now - lastEscapeTime < 1000) {
@@ -966,7 +1151,7 @@ export default function App() {
 
     window.addEventListener('keydown', handleEscapeKey);
     return () => window.removeEventListener('keydown', handleEscapeKey);
-  }, [zoomedImage, selectedTour, showPremiumFleet, lastEscapeTime]);
+  }, [zoomedImage, selectedTour, showPremiumFleet, showVideosPage, lastEscapeTime]);
   const [isDestinationsOpen, setIsDestinationsOpen] = useState(false);
   const [isDayToursOpen, setIsDayToursOpen] = useState(false);
   const [activeState, setActiveState] = useState<string | null>(null);
@@ -1005,6 +1190,7 @@ export default function App() {
     e.preventDefault();
     setSelectedTour(null);
     setShowPremiumFleet(false);
+    setShowVideosPage(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setIsTransportOpen(false);
     setIsMenuOpen(false);
@@ -1021,6 +1207,7 @@ export default function App() {
     e.preventDefault();
     setSelectedTour(null);
     setShowPremiumFleet(false);
+    setShowVideosPage(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setIsDestinationsOpen(true);
     setIsDayToursOpen(false);
@@ -1031,6 +1218,7 @@ export default function App() {
     e.preventDefault();
     setSelectedTour(null);
     setShowPremiumFleet(false);
+    setShowVideosPage(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setIsDayToursOpen(true);
     setIsDestinationsOpen(false);
@@ -1044,10 +1232,28 @@ export default function App() {
     setIsDayToursOpen(false);
   };
 
+  const handleVideoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowVideosPage(true);
+    setSelectedTour(null);
+    setShowPremiumFleet(false);
+    setIsMenuOpen(false);
+    setIsTransportOpen(false);
+    setIsDestinationsOpen(false);
+    setIsDayToursOpen(false);
+    setShowExplore(false);
+    setShowContact(false);
+    setShowTerms(false);
+    setShowPrivacy(false);
+    setSocialModalType(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handlePopularTourClick = (e: React.MouseEvent, tourName: string) => {
     e.preventDefault();
     setSelectedTour(tourName);
     setShowPremiumFleet(false);
+    setShowVideosPage(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -1055,6 +1261,7 @@ export default function App() {
     e.preventDefault();
     setShowPremiumFleet(true);
     setSelectedTour(null);
+    setShowVideosPage(false);
     setIsMenuOpen(false);
     setIsTransportOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1311,7 +1518,14 @@ export default function App() {
             )}
           </div>
           
-          <button onClick={() => setShowContact(true)} className="text-[#00205B] font-bold hover:text-[#BE1E2D] transition-colors">Contact</button>
+          <button 
+            onClick={handleVideoClick} 
+            className={`font-bold transition-colors cursor-pointer ${showVideosPage ? 'text-[#BE1E2D]' : 'text-[#00205B] hover:text-[#BE1E2D]'}`}
+          >
+            Video
+          </button>
+          
+          <button onClick={() => setShowContact(true)} className="text-[#00205B] font-bold hover:text-[#BE1E2D] transition-colors cursor-pointer">Contact</button>
         </nav>
 
         {/* Mobile Menu Toggle */}
@@ -1539,13 +1753,29 @@ export default function App() {
               )}
             </div>
             
+            <button 
+              className={`py-3 px-4 text-left font-bold hover:bg-gray-50 rounded-md transition-colors cursor-pointer ${showVideosPage ? 'text-[#BE1E2D]' : 'text-[#00205B] hover:text-[#BE1E2D]'}`} 
+              onClick={handleVideoClick}
+            >
+              Video
+            </button>
+
             <button className="py-3 px-4 text-left text-[#00205B] font-bold hover:bg-gray-50 hover:text-[#BE1E2D] rounded-md" onClick={() => { setIsMenuOpen(false); setShowContact(true); }}>Contact</button>
           </nav>
         </div>
       )}
 
       {/* Main Content Area */}
-      {showPremiumFleet ? (
+      {showVideosPage ? (
+        <VideosPage 
+          onBack={() => setShowVideosPage(false)} 
+          onSelectTour={(tourKey) => {
+            setShowVideosPage(false);
+            setSelectedTour(tourKey);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }} 
+        />
+      ) : showPremiumFleet ? (
         <PremiumFleetPage onBack={() => setShowPremiumFleet(false)} />
       ) : selectedTour ? (
         <TourDetailsPage tourName={selectedTour} onBack={() => setSelectedTour(null)} />
