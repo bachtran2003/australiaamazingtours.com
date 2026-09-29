@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Phone, Mail, ChevronRight, ChevronLeft, ChevronDown, Facebook, Twitter, Instagram, Menu, X, ArrowLeft, Check, X as XIcon, Home, Search, Compass, MessageCircle, Send, Video, Play } from 'lucide-react';
 
 function PremiumFleetPage({ onBack }: { onBack: () => void }) {
@@ -705,9 +705,88 @@ const tourData: Record<string, any> = {
 
   tourData['Uluru & Red Centre'] = tourData['Uluru'];
 
-function VideosPage({ onBack, onSelectTour }: { onBack: () => void; onSelectTour: (tourName: string) => void }) {
+  tourData['Melbourne 5 Days 4 Nights'] = {
+    title: 'Melbourne 5 Ngày 4 Đêm – Lịch Trình Siêu Chi Tiết',
+    image: 'https://i.ytimg.com/vi/OsOeSVJEA-0/hqdefault.jpg',
+    description: [
+      'Lịch trình khám phá Melbourne 5 ngày 4 đêm siêu chi tiết và mới nhất: từ trung tâm văn hóa sôi động Melbourne, cung đường Great Ocean Road kỳ vĩ, thung lũng rượu vang Yarra Valley cho đến đảo Phillip Island ngắm chim cánh cụt.',
+      'Toàn bộ kinh nghiệm di chuyển, ăn uống, tham quan thực tế giúp chuyến du lịch nước Úc của bạn trọn vẹn và đáng nhớ nhất.'
+    ],
+    highlights: [
+      'Lịch trình chuẩn 5 ngày 4 đêm khám phá đầy đủ biểu tượng của Melbourne & Victoria.',
+      'Cung đường ven biển Great Ocean Road & kỳ quan Twelve Apostles.',
+      'Trải nghiệm rượu vang thượng hạng tại thung lũng Yarra Valley.',
+      'Khám phá thiên nhiên hoang dã và Penguin Parade tại Phillip Island.',
+      'Hướng dẫn du lịch Úc tự túc mới nhất 2026 siêu chi tiết.'
+    ],
+    quote: 'Melbourne 5 ngày 4 đêm – Cẩm nang du lịch Úc trọn vẹn và thực tế nhất!',
+    itinerary: [
+      { day: 'Day 1', title: 'Trung tâm Melbourne & Phố cổ nghệ thuật', description: 'Federation Square, Flinders Street Station, các con ngõ nghệ thuật Laneways, và ngắm hoàng hôn bên sông Yarra.' },
+      { day: 'Day 2', title: 'Cung đường huyền thoại Great Ocean Road', description: 'Lorne, Apollo Bay, kỳ quan 12 Vị Tông Đồ (Twelve Apostles) và hẻm núi Loch Ard Gorge.' },
+      { day: 'Day 3', title: 'Thung lũng rượu vang Yarra Valley & Dandenong', description: 'Trải nghiệm thử rượu vang cao cấp, ghé xưởng sô-cô-la và đi tàu hơi nước Puffing Billy.' },
+      { day: 'Day 4', title: 'Đảo Phillip Island & Penguin Parade', description: 'Thăm công viên động vật hoang dã Koala & ngắm đàn chim cánh cụt diễu hành về tổ lúc hoàng hôn.' },
+      { day: 'Day 5', title: 'Chợ Queen Victoria & Cà phê Melbourne', description: 'Thưởng thức văn hóa cà phê nức tiếng thế giới và mua sắm nông sản quà lưu niệm đặc sắc.' }
+    ],
+    inclusions: ['Lịch trình hướng dẫn chi tiết', 'Tư vấn phương tiện & hỗ trợ tham quan'],
+    exclusions: ['Chi phí cá nhân', 'Vé máy bay quốc tế'],
+    price: 'Video Nổi Bật',
+    videos: [
+      'https://www.youtube.com/embed/OsOeSVJEA-0?si=vyE2mAx1oGbsFd0i'
+    ],
+    gallery: [
+      'https://i.ytimg.com/vi/OsOeSVJEA-0/hqdefault.jpg',
+      'https://i.postimg.cc/T2CC25Yj/1_(13).jpg',
+      'https://i.postimg.cc/Hxv91nQh/2.jpg'
+    ]
+  };
+
+const tourVideoItems = [
+  { key: 'Melbourne 5 Days 4 Nights', label: 'Melbourne 5N4Đ Lịch Trình Chi Tiết Video' },
+  { key: 'Melbourne Culture', label: 'Melbourne City Tour Video' },
+  { key: 'Great Ocean Road', label: 'Great Ocean Road Video' },
+  { key: 'Sydney Highlights', label: 'Sydney & Bondi Beach Video' },
+  { key: 'Great Barrier Reef', label: 'Great Barrier Reef Video' },
+  { key: 'Brisbane & Gold Coast', label: 'Brisbane & Gold Coast Video' },
+  { key: 'Adelaide & Barossa', label: 'Adelaide & Barossa Valley Video' },
+  { key: 'Yarra Valley', label: 'Yarra Valley Winery Video' },
+  { key: 'Phillip Island', label: 'Phillip Island Penguin Parade Video' },
+  { key: 'Puffing Billy Steam Train', label: 'Puffing Billy Steam Train Video' },
+  { key: 'Mt Buller', label: 'Mt Buller Snow Tour Video' },
+  { key: 'Bright Autumn', label: 'Bright Autumn Foliage Video' },
+  { key: 'Canberra', label: 'Canberra Capital City Video' },
+  { key: 'Uluru', label: 'Uluru & Red Centre Video' },
+  { key: 'Maru Koala Park', label: 'Maru Koala & Animal Park Video' },
+  { key: 'Ballarat Tour', label: 'Ballarat Sovereign Hill Video' },
+  { key: 'Mount Macedon', label: 'Mount Macedon Tour Video' },
+  { key: 'Cherry Farm', label: 'Cherry Farm Picking Video' },
+  { key: 'Strawberry Farm', label: 'Strawberry Farm Picking Video' }
+];
+
+function VideosPage({ 
+  onBack, 
+  onSelectTour,
+  initialVideoKey 
+}: { 
+  onBack: () => void; 
+  onSelectTour: (tourName: string) => void;
+  initialVideoKey?: string | null;
+}) {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    if (initialVideoKey) {
+      setSelectedCategory('All');
+      setSearchQuery('');
+      const timer = setTimeout(() => {
+        const el = document.getElementById(`video-${initialVideoKey}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [initialVideoKey]);
 
   const categories = [
     'All',
@@ -720,7 +799,7 @@ function VideosPage({ onBack, onSelectTour }: { onBack: () => void; onSelectTour
   ];
 
   const getRegion = (key: string) => {
-    if (['Melbourne Culture', 'Great Ocean Road', 'Yarra Valley', 'Phillip Island', 'Mt Buller', 'Puffing Billy Steam Train', 'Ballarat Tour'].includes(key)) {
+    if (['Melbourne 5 Days 4 Nights', 'Melbourne Culture', 'Great Ocean Road', 'Yarra Valley', 'Phillip Island', 'Mt Buller', 'Puffing Billy Steam Train', 'Ballarat Tour'].includes(key)) {
       return 'Melbourne & Victoria';
     }
     if (['Maru Koala Park', 'Mount Macedon', 'Bright Autumn', 'Cherry Farm', 'Strawberry Farm'].includes(key)) {
@@ -751,7 +830,8 @@ function VideosPage({ onBack, onSelectTour }: { onBack: () => void; onSelectTour
       highlights: tour.highlights || [],
       price: tour.price,
       region: getRegion(key)
-    }));
+    }))
+    .sort((a, b) => (a.key === 'Melbourne 5 Days 4 Nights' ? -1 : b.key === 'Melbourne 5 Days 4 Nights' ? 1 : 0));
 
   const filteredVideos = videoList.filter(item => {
     const matchesCategory = selectedCategory === 'All' || item.region === selectedCategory;
@@ -786,6 +866,30 @@ function VideosPage({ onBack, onSelectTour }: { onBack: () => void; onSelectTour
             <Video size={280} />
           </div>
         </div>
+
+        {/* Selected Video Banner */}
+        {initialVideoKey && tourData[initialVideoKey] && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="bg-[#BE1E2D] text-white p-2.5 rounded-xl shadow-sm shrink-0">
+                <Play size={18} className="fill-white" />
+              </div>
+              <div>
+                <p className="text-[11px] uppercase font-bold tracking-wider text-[#BE1E2D]">Selected Tour Video</p>
+                <h4 className="font-bold text-[#00205B] text-base md:text-lg">{tourData[initialVideoKey].title || initialVideoKey}</h4>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                const el = document.getElementById(`video-${initialVideoKey}`);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }}
+              className="text-xs font-bold text-white bg-[#00205B] hover:bg-[#BE1E2D] px-4 py-2 rounded-lg transition-colors shadow-sm cursor-pointer whitespace-nowrap"
+            >
+              Watch Video Below ↓
+            </button>
+          </div>
+        )}
 
         {/* Filter & Search Bar */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-8 flex flex-col md:flex-row gap-4 justify-between items-center">
@@ -831,7 +935,15 @@ function VideosPage({ onBack, onSelectTour }: { onBack: () => void; onSelectTour
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredVideos.map((item) => (
-              <div key={item.key} className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col group">
+              <div 
+                key={item.key} 
+                id={`video-${item.key}`}
+                className={`bg-white rounded-2xl overflow-hidden transition-all duration-500 border flex flex-col group ${
+                  initialVideoKey === item.key 
+                    ? 'ring-4 ring-[#BE1E2D] shadow-2xl scale-[1.02] border-[#BE1E2D]' 
+                    : 'shadow-md hover:shadow-xl border-gray-100'
+                }`}
+              >
                 <div className="relative aspect-video bg-black">
                   <iframe
                     src={item.videos[0]}
@@ -1137,6 +1249,7 @@ export default function App() {
           setShowPremiumFleet(false);
         } else if (showVideosPage) {
           setShowVideosPage(false);
+          setSelectedVideoKey(null);
         } else if (selectedTour) {
           const now = Date.now();
           if (now - lastEscapeTime < 1000) {
@@ -1158,6 +1271,27 @@ export default function App() {
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
   const [isTransportOpen, setIsTransportOpen] = useState(false);
   const [activeTransportState, setActiveTransportState] = useState<string | null>(null);
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const [isMobileVideoOpen, setIsMobileVideoOpen] = useState(false);
+  const [selectedVideoKey, setSelectedVideoKey] = useState<string | null>(null);
+  const videoTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnterVideo = () => {
+    if (videoTimeoutRef.current) {
+      clearTimeout(videoTimeoutRef.current);
+      videoTimeoutRef.current = null;
+    }
+    setIsVideoOpen(true);
+  };
+
+  const handleMouseLeaveVideo = () => {
+    if (videoTimeoutRef.current) {
+      clearTimeout(videoTimeoutRef.current);
+    }
+    videoTimeoutRef.current = setTimeout(() => {
+      setIsVideoOpen(false);
+    }, 400);
+  };
   const [showExplore, setShowExplore] = useState(false);
   const [showContact, setShowContact] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
@@ -1191,8 +1325,11 @@ export default function App() {
     setSelectedTour(null);
     setShowPremiumFleet(false);
     setShowVideosPage(false);
+    setSelectedVideoKey(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setIsTransportOpen(false);
+    setIsVideoOpen(false);
+    setIsMobileVideoOpen(false);
     setIsMenuOpen(false);
     setIsDestinationsOpen(false);
     setIsDayToursOpen(false);
@@ -1208,10 +1345,12 @@ export default function App() {
     setSelectedTour(null);
     setShowPremiumFleet(false);
     setShowVideosPage(false);
+    setSelectedVideoKey(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setIsDestinationsOpen(true);
     setIsDayToursOpen(false);
     setIsTransportOpen(false);
+    setIsVideoOpen(false);
   };
 
   const handleDayToursClick = (e: React.MouseEvent) => {
@@ -1219,10 +1358,12 @@ export default function App() {
     setSelectedTour(null);
     setShowPremiumFleet(false);
     setShowVideosPage(false);
+    setSelectedVideoKey(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setIsDayToursOpen(true);
     setIsDestinationsOpen(false);
     setIsTransportOpen(false);
+    setIsVideoOpen(false);
   };
 
   const handleTransportClick = (e: React.MouseEvent) => {
@@ -1230,13 +1371,39 @@ export default function App() {
     setIsTransportOpen(!isTransportOpen);
     setIsDestinationsOpen(false);
     setIsDayToursOpen(false);
+    setIsVideoOpen(false);
   };
 
   const handleVideoClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    if (videoTimeoutRef.current) clearTimeout(videoTimeoutRef.current);
+    setSelectedVideoKey(null);
     setShowVideosPage(true);
     setSelectedTour(null);
     setShowPremiumFleet(false);
+    setIsVideoOpen(false);
+    setIsMobileVideoOpen(false);
+    setIsMenuOpen(false);
+    setIsTransportOpen(false);
+    setIsDestinationsOpen(false);
+    setIsDayToursOpen(false);
+    setShowExplore(false);
+    setShowContact(false);
+    setShowTerms(false);
+    setShowPrivacy(false);
+    setSocialModalType(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSelectVideoTour = (e: React.MouseEvent, tourKey: string) => {
+    e.preventDefault();
+    if (videoTimeoutRef.current) clearTimeout(videoTimeoutRef.current);
+    setSelectedVideoKey(tourKey);
+    setShowVideosPage(true);
+    setSelectedTour(null);
+    setShowPremiumFleet(false);
+    setIsVideoOpen(false);
+    setIsMobileVideoOpen(false);
     setIsMenuOpen(false);
     setIsTransportOpen(false);
     setIsDestinationsOpen(false);
@@ -1254,6 +1421,8 @@ export default function App() {
     setSelectedTour(tourName);
     setShowPremiumFleet(false);
     setShowVideosPage(false);
+    setSelectedVideoKey(null);
+    setIsVideoOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -1262,6 +1431,8 @@ export default function App() {
     setShowPremiumFleet(true);
     setSelectedTour(null);
     setShowVideosPage(false);
+    setSelectedVideoKey(null);
+    setIsVideoOpen(false);
     setIsMenuOpen(false);
     setIsTransportOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1518,12 +1689,59 @@ export default function App() {
             )}
           </div>
           
-          <button 
-            onClick={handleVideoClick} 
-            className={`font-bold transition-colors cursor-pointer ${showVideosPage ? 'text-[#BE1E2D]' : 'text-[#00205B] hover:text-[#BE1E2D]'}`}
+          <div 
+            className="relative" 
+            onMouseEnter={handleMouseEnterVideo} 
+            onMouseLeave={handleMouseLeaveVideo}
           >
-            Video
-          </button>
+            <button 
+              onClick={handleVideoClick} 
+              className={`font-bold transition-colors cursor-pointer flex items-center gap-1 py-2 ${showVideosPage ? 'text-[#BE1E2D]' : 'text-[#00205B] hover:text-[#BE1E2D]'}`}
+            >
+              Video <ChevronDown size={16} className={`transition-transform duration-200 ${isVideoOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {isVideoOpen && (
+              <div 
+                className="absolute top-full -left-6 pt-2 w-84 z-50"
+                onMouseEnter={handleMouseEnterVideo}
+                onMouseLeave={handleMouseLeaveVideo}
+              >
+                <div className="bg-white shadow-2xl rounded-xl border border-gray-200 overflow-hidden ring-1 ring-black/5">
+                  <a 
+                    href="#" 
+                    onClick={handleVideoClick} 
+                    className="flex items-center justify-between px-4 py-3 text-sm font-bold text-[#BE1E2D] hover:bg-red-50 border-b border-gray-100 transition-colors bg-white sticky top-0 z-10"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Play size={15} className="fill-[#BE1E2D] text-[#BE1E2D]" />
+                      All Tour Videos (Tất cả video)
+                    </span>
+                    <span className="text-xs bg-red-100 text-[#BE1E2D] px-2 py-0.5 rounded-full font-semibold">
+                      {tourVideoItems.length}
+                    </span>
+                  </a>
+                  
+                  <div className="py-1 max-h-[440px] overflow-y-auto overscroll-contain">
+                    {tourVideoItems.map((item) => (
+                      <a 
+                        key={item.key}
+                        href="#" 
+                        onClick={(e) => {
+                          if (videoTimeoutRef.current) clearTimeout(videoTimeoutRef.current);
+                          handleSelectVideoTour(e, item.key);
+                        }} 
+                        className={`flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#BE1E2D] transition-colors ${selectedVideoKey === item.key && showVideosPage ? 'bg-red-50 text-[#BE1E2D] font-semibold' : ''}`}
+                      >
+                        <Play size={12} className="text-[#BE1E2D] shrink-0 fill-[#BE1E2D]/20" />
+                        <span className="truncate">{item.label}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
           
           <button onClick={() => setShowContact(true)} className="text-[#00205B] font-bold hover:text-[#BE1E2D] transition-colors cursor-pointer">Contact</button>
         </nav>
@@ -1753,12 +1971,52 @@ export default function App() {
               )}
             </div>
             
-            <button 
-              className={`py-3 px-4 text-left font-bold hover:bg-gray-50 rounded-md transition-colors cursor-pointer ${showVideosPage ? 'text-[#BE1E2D]' : 'text-[#00205B] hover:text-[#BE1E2D]'}`} 
-              onClick={handleVideoClick}
-            >
-              Video
-            </button>
+            <div className="flex flex-col">
+              <button 
+                className="py-3 px-4 text-[#00205B] font-bold hover:bg-gray-50 hover:text-[#BE1E2D] rounded-md flex justify-between items-center transition-colors cursor-pointer"
+                onClick={() => setIsMobileVideoOpen(!isMobileVideoOpen)}
+              >
+                <span className={showVideosPage ? 'text-[#BE1E2D]' : ''}>Video</span>
+                <ChevronDown size={18} className={`transition-transform duration-200 ${isMobileVideoOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {isMobileVideoOpen && (
+                <div className="pl-4 flex flex-col gap-1 mt-1 max-h-72 overflow-y-auto border-l-2 border-gray-100 ml-4 py-1">
+                  <a 
+                    href="#" 
+                    className="text-sm font-bold text-[#BE1E2D] hover:bg-red-50 py-2 px-3 rounded flex items-center justify-between transition-colors"
+                    onClick={(e) => {
+                      setIsMenuOpen(false);
+                      setIsMobileVideoOpen(false);
+                      handleVideoClick(e);
+                    }}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Play size={14} className="fill-[#BE1E2D] text-[#BE1E2D]" /> All Tour Videos (Tất cả video)
+                    </span>
+                    <span className="text-xs bg-red-100 text-[#BE1E2D] px-2 py-0.5 rounded-full font-semibold">
+                      {tourVideoItems.length}
+                    </span>
+                  </a>
+
+                  {tourVideoItems.map((item) => (
+                    <a 
+                      key={item.key}
+                      href="#" 
+                      className={`text-sm text-gray-600 hover:text-[#BE1E2D] py-1.5 px-3 rounded flex items-center gap-2 transition-colors ${selectedVideoKey === item.key && showVideosPage ? 'bg-red-50 text-[#BE1E2D] font-semibold' : ''}`}
+                      onClick={(e) => {
+                        setIsMenuOpen(false);
+                        setIsMobileVideoOpen(false);
+                        handleSelectVideoTour(e, item.key);
+                      }}
+                    >
+                      <Play size={12} className="text-[#BE1E2D] shrink-0 fill-[#BE1E2D]/20" />
+                      <span className="truncate">{item.label}</span>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <button className="py-3 px-4 text-left text-[#00205B] font-bold hover:bg-gray-50 hover:text-[#BE1E2D] rounded-md" onClick={() => { setIsMenuOpen(false); setShowContact(true); }}>Contact</button>
           </nav>
@@ -1768,9 +2026,14 @@ export default function App() {
       {/* Main Content Area */}
       {showVideosPage ? (
         <VideosPage 
-          onBack={() => setShowVideosPage(false)} 
+          onBack={() => {
+            setShowVideosPage(false);
+            setSelectedVideoKey(null);
+          }} 
+          initialVideoKey={selectedVideoKey}
           onSelectTour={(tourKey) => {
             setShowVideosPage(false);
+            setSelectedVideoKey(null);
             setSelectedTour(tourKey);
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }} 
