@@ -1298,6 +1298,106 @@ export default function App() {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [socialModalType, setSocialModalType] = useState<'zalo' | 'whatsapp' | null>(null);
 
+  // Real Visitor counter statistics
+  const [visitorStats, setVisitorStats] = useState({
+    online: 1,
+    day: 1,
+    week: 1,
+    month: 1,
+    totalVisits: 1
+  });
+
+  useEffect(() => {
+    let clientId = localStorage.getItem('aat_client_id');
+    if (!clientId) {
+      clientId = 'client_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now();
+      localStorage.setItem('aat_client_id', clientId);
+    }
+
+    const isNewSession = !sessionStorage.getItem('aat_session_registered');
+    if (isNewSession) {
+      sessionStorage.setItem('aat_session_registered', 'true');
+    }
+
+    const fetchStats = async (isNew: boolean) => {
+      try {
+        const res = await fetch('/api/stats/visit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId, isNewSession: isNew })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setVisitorStats({
+            online: data.online || 1,
+            day: data.day || 1,
+            week: data.week || 1,
+            month: data.month || 1,
+            totalVisits: data.totalVisits || 1
+          });
+          localStorage.setItem('aat_cached_stats', JSON.stringify(data));
+          return;
+        }
+      } catch (err) {
+        console.warn('Real stats API unreachable, using local calculation:', err);
+      }
+
+      // Fallback calculation from site launch date if offline
+      const launch = new Date('2026-09-29T00:00:00.000Z');
+      const now = new Date();
+      const diffMs = Math.max(0, now.getTime() - launch.getTime());
+      const calcDay = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
+      const calcWeek = Math.floor((calcDay - 1) / 7) + 1;
+      const calcMonth = (now.getFullYear() - launch.getFullYear()) * 12 + (now.getMonth() - launch.getMonth()) + 1;
+
+      const cached = localStorage.getItem('aat_cached_stats');
+      let fallbackVisits = 1;
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          fallbackVisits = parsed.totalVisits || 1;
+        } catch {}
+      }
+      if (isNew) {
+        fallbackVisits += 1;
+      }
+
+      setVisitorStats({
+        online: 1,
+        day: calcDay,
+        week: calcWeek,
+        month: calcMonth,
+        totalVisits: fallbackVisits
+      });
+    };
+
+    fetchStats(isNewSession);
+
+    // Heartbeat to keep real active online visitor count updated every 20 seconds
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch('/api/stats/heartbeat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setVisitorStats(prev => ({
+            ...prev,
+            online: data.online || 1,
+            day: data.day || prev.day,
+            week: data.week || prev.week,
+            month: data.month || prev.month,
+            totalVisits: data.totalVisits || prev.totalVisits
+          }));
+        }
+      } catch {}
+    }, 20000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   // AI Chat State
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessage, setChatMessage] = useState('');
@@ -2282,8 +2382,8 @@ export default function App() {
       )}
 
       {/* Footer */}
-      <footer className="bg-[#00205B] text-white pt-16 pb-8 px-6 mt-auto">
-        <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+      <footer className="bg-[#00205B] text-white pt-16 pb-12 px-6 mt-auto">
+        <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div>
             <h3 className="text-xl font-bold mb-6 inline-block border-b-2 border-[#BE1E2D] pb-2">About Us</h3>
             <p className="text-gray-300 leading-relaxed">
@@ -2355,11 +2455,35 @@ export default function App() {
             </div>
           </div>
         </div>
-        
-        <div className="container mx-auto border-t border-white/10 pt-8 text-center text-sm text-gray-400">
-          <p>&copy; {new Date().getFullYear()} VAT Holiday Pty Ltd. All rights reserved.</p>
-        </div>
       </footer>
+
+      {/* Bottom Red Line: Visitor Statistics & Copyright Bar */}
+      <div className="bg-[#BE1E2D] text-white py-3 px-4 md:px-8 border-t border-red-700/40 select-none">
+        <div className="container mx-auto flex flex-col lg:flex-row items-center justify-between gap-3 text-xs md:text-sm">
+          <p className="text-white text-center lg:text-left font-normal">
+            &copy; {new Date().getFullYear()} VAT Holiday Pty Ltd. All rights reserved.
+          </p>
+          
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs md:text-sm text-white font-medium">
+            <span className="inline-flex items-center">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-1.5 shrink-0"></span>
+              Online: <strong className="font-bold ml-1 text-white">{visitorStats.online}</strong>
+            </span>
+            <span>
+              Day: <strong className="font-bold ml-1 text-white">{visitorStats.day}</strong>
+            </span>
+            <span>
+              Week: <strong className="font-bold ml-1 text-white">{visitorStats.week}</strong>
+            </span>
+            <span>
+              Month: <strong className="font-bold ml-1 text-white">{visitorStats.month.toLocaleString()}</strong>
+            </span>
+            <span>
+              Total Visits: <strong className="font-bold ml-1 text-white">{visitorStats.totalVisits.toLocaleString()}</strong>
+            </span>
+          </div>
+        </div>
+      </div>
 
       {/* Terms and Conditions Modal */}
       {showTerms && (
