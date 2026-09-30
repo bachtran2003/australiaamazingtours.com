@@ -110,6 +110,24 @@ app.get('/api/stats', (_req, res) => {
   res.json(computeStats(stats));
 });
 
+app.get('/robots.txt', (_req, res) => {
+  const robotsPath = path.resolve(__dirname, 'public', 'robots.txt');
+  if (fs.existsSync(robotsPath)) {
+    res.type('text/plain').sendFile(robotsPath);
+  } else {
+    res.type('text/plain').send('User-agent: *\nAllow: /\nSitemap: https://melbournehalfdaytours.com.au/sitemap.xml\n');
+  }
+});
+
+app.get('/sitemap.xml', (_req, res) => {
+  const sitemapPath = path.resolve(__dirname, 'public', 'sitemap.xml');
+  if (fs.existsSync(sitemapPath)) {
+    res.type('application/xml').sendFile(sitemapPath);
+  } else {
+    res.status(404).send('Not found');
+  }
+});
+
 async function startServer() {
   if (!isProd) {
     const vite = await createViteServer({
