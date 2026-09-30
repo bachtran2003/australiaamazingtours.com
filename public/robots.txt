@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://melbournehalfdaytours.com.au/sitemap.xml
+Sitemap: https://www.australiaamazingtours.com/sitemap.xml

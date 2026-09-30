@@ -2150,8 +2150,12 @@ export default function App() {
             style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${heroImages[currentHeroIndex].url}')` }}
           >
             <div className="px-4 max-w-4xl z-10">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 drop-shadow-lg tracking-tight">AUSTRALIA AMAZING TOURS</h1>
-              <p className="text-lg md:text-2xl mb-8 drop-shadow-md font-medium text-gray-100">Expertly crafted tours by VAT Holiday Pty Ltd</p>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 drop-shadow-lg tracking-tight">
+                AUSTRALIA TOURS & MELBOURNE DAY TOURS
+              </h1>
+              <p className="text-lg md:text-2xl mb-8 drop-shadow-md font-medium text-gray-100">
+                Australia Amazing Tours – Premier Australia Day Trips & Holidays by VAT Holiday Pty Ltd
+              </p>
               <button onClick={(e) => { e.preventDefault(); setShowExplore(true); }} className="inline-block bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 hover:from-orange-600 hover:via-red-600 hover:to-pink-600 text-white font-bold py-4 px-10 rounded-full text-xl transition-all duration-300 shadow-[0_0_20px_rgba(239,68,68,0.5)] hover:shadow-[0_0_30px_rgba(239,68,68,0.8)] transform hover:-translate-y-1 border-2 border-white/20">
                 Explore Tours
               </button>

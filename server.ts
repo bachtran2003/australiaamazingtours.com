@@ -115,7 +115,7 @@ app.get('/robots.txt', (_req, res) => {
   if (fs.existsSync(robotsPath)) {
     res.type('text/plain').sendFile(robotsPath);
   } else {
-    res.type('text/plain').send('User-agent: *\nAllow: /\nSitemap: https://melbournehalfdaytours.com.au/sitemap.xml\n');
+    res.type('text/plain').send('User-agent: *\nAllow: /\nSitemap: https://www.australiaamazingtours.com/sitemap.xml\n');
   }
 });
 
