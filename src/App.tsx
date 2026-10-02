@@ -705,6 +705,42 @@ const tourData: Record<string, any> = {
 
   tourData['Uluru & Red Centre'] = tourData['Uluru'];
 
+  tourData['Spring in Melbourne'] = {
+    title: 'Spring in Melbourne – Video Mùa Xuân Melbourne',
+    image: 'https://i.ytimg.com/vi/yQ29ddbz9W4/hqdefault.jpg',
+    description: [
+      'Khám phá vẻ đẹp rực rỡ và lãng mạn của mùa xuân Melbourne nước Úc. Những cung đường ngập tràn sắc hoa, không khí trong lành mát mẻ và những điểm check-in tuyệt đẹp trong tiết trời mùa xuân thanh khiết.',
+      'Melbourne vào xuân khoác lên mình tấm áo mới với muôn sắc hoa anh đào, hoa tulip tại Tesselaar Tulip Festival, công viên Royal Botanic Gardens và cảnh quan thơ mộng của bang Victoria.',
+      'Trải nghiệm tuyệt vời và đáng nhớ dành cho du khách khi đến thăm thành phố văn hóa Melbourne đáng sống nhất thế giới vào thời khắc đẹp nhất trong năm.'
+    ],
+    highlights: [
+      'Sắc hoa mùa xuân rực rỡ khắp công viên Royal Botanic Gardens & đường phố Melbourne.',
+      'Lễ hội hoa Tulip Tesselaar nổi tiếng và thung lũng hoa Dandenong Ranges.',
+      'Khí hậu mùa xuân trong lành, mát mẻ lý tưởng cho mọi hoạt động ngoài trời.',
+      'Check-in những góc phố cổ kính, bến cảng Docklands và sông Yarra rực rỡ sắc xuân.',
+      'Video ngắn (YouTube Shorts) sống động ghi lại trọn vẹn nét đẹp mùa xuân nước Úc.'
+    ],
+    quote: 'Mùa xuân Melbourne – Khoảnh khắc rực rỡ và quyến rũ nhất của nước Úc!',
+    itinerary: [
+      { day: 'Điểm 1', title: 'Vườn thực vật Royal Botanic Gardens', description: 'Dạo bước giữa thảm hoa xuân ngập tràn sắc màu và không gian xanh ngắt giữa lòng thành phố.' },
+      { day: 'Điểm 2', title: 'Lễ hội hoa Tesselaar Tulip Festival', description: 'Chiêm ngưỡng hàng triệu bông hoa tulip khoe sắc rực rỡ tại vùng núi Dandenong Ranges.' },
+      { day: 'Điểm 3', title: 'Sông Yarra & Cầu cảng Princes Bridge', description: 'Tận hưởng làn gió mát lành mùa xuân và ngắm nhìn nhịp sống sôi động của Melbourne.' },
+      { day: 'Điểm 4', title: 'Phố cổ nghệ thuật & Cà phê xuân', description: 'Thưởng thức ly cà phê Melbourne trứ danh tại các quán ngoài trời rợp bóng cây xanh mát.' }
+    ],
+    inclusions: ['Video chất lượng cao', 'Cẩm nang du lịch mùa xuân Melbourne'],
+    exclusions: ['Chi phí cá nhân'],
+    price: 'Video Nổi Bật',
+    videos: [
+      'https://www.youtube.com/embed/yQ29ddbz9W4'
+    ],
+    gallery: [
+      'https://i.ytimg.com/vi/yQ29ddbz9W4/hqdefault.jpg',
+      'https://i.ytimg.com/vi/OsOeSVJEA-0/hqdefault.jpg',
+      'https://i.postimg.cc/T2CC25Yj/1_(13).jpg',
+      'https://i.postimg.cc/V6SH0jsB/42.jpg'
+    ]
+  };
+
   tourData['Melbourne 5 Days 4 Nights'] = {
     title: 'Melbourne 5 Ngày 4 Đêm – Lịch Trình Siêu Chi Tiết',
     image: 'https://i.ytimg.com/vi/OsOeSVJEA-0/hqdefault.jpg',
@@ -741,6 +777,7 @@ const tourData: Record<string, any> = {
   };
 
 const tourVideoItems = [
+  { key: 'Spring in Melbourne', label: 'Spring in Melbourne – Mùa Xuân Melbourne Video' },
   { key: 'Melbourne 5 Days 4 Nights', label: 'Melbourne 5N4Đ Lịch Trình Chi Tiết Video' },
   { key: 'Melbourne Culture', label: 'Melbourne City Tour Video' },
   { key: 'Great Ocean Road', label: 'Great Ocean Road Video' },
@@ -831,7 +868,15 @@ function VideosPage({
       price: tour.price,
       region: getRegion(key)
     }))
-    .sort((a, b) => (a.key === 'Melbourne 5 Days 4 Nights' ? -1 : b.key === 'Melbourne 5 Days 4 Nights' ? 1 : 0));
+    .sort((a, b) => {
+      const priorityOrder: Record<string, number> = {
+        'Spring in Melbourne': 1,
+        'Melbourne 5 Days 4 Nights': 2
+      };
+      const orderA = priorityOrder[a.key] || 999;
+      const orderB = priorityOrder[b.key] || 999;
+      return orderA - orderB;
+    });
 
   const filteredVideos = videoList.filter(item => {
     const matchesCategory = selectedCategory === 'All' || item.region === selectedCategory;

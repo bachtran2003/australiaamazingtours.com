@@ -7,6 +7,13 @@
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/yQ29ddbz9W4/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>Spring in Melbourne – Video Mùa Xuân Melbourne Úc</video:title>
+      <video:description>Khám phá vẻ đẹp rực rỡ của mùa xuân Melbourne nước Úc qua video ngắn sống động.</video:description>
+      <video:content_loc>https://youtube.com/shorts/yQ29ddbz9W4?feature=share</video:content_loc>
+      <video:player_loc>https://www.youtube.com/embed/yQ29ddbz9W4</video:player_loc>
+    </video:video>
+    <video:video>
       <video:thumbnail_loc>https://i.ytimg.com/vi/OsOeSVJEA-0/hqdefault.jpg</video:thumbnail_loc>
       <video:title>Melbourne 5 Days 4 Nights Tour – Complete Detailed Travel Guide 2026</video:title>
       <video:description>Australia and Melbourne tour travel itinerary exploring Great Ocean Road, Yarra Valley, Phillip Island, and city culture.</video:description>
